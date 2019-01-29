@@ -393,11 +393,9 @@ static int overlay_fixup_one_phandle(void *fdt, void *fdto,
 		return fixup_off;
 
 	phandle_prop = cpu_to_fdt32(phandle);
-	return fdt_setprop_inplace_namelen_partial(fdto, fixup_off,
-						   name, name_len, (uint32_t)poffset,
-						   &phandle_prop,
-						   (int)sizeof(phandle_prop));
-};
+    int sz = (int)sizeof(phandle_prop);
+	return fdt_setprop_inplace_namelen_partial(fdto, fixup_off, name, (int)name_len, (uint32_t)poffset, &phandle_prop, sz);
+}
 
 /**
  * overlay_fixup_phandle - Set an overlay phandle to the base one
@@ -445,7 +443,7 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		fixup_end = memchr(value, '\0', (size_t)len);
 		if (!fixup_end)
 			return -FDT_ERR_BADOVERLAY;
-		fixup_len = fixup_end - fixup_str;
+		fixup_len = (int)(fixup_end - fixup_str);
 
 		len -= fixup_len + 1;
 		value += fixup_len + 1;
@@ -455,7 +453,7 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		if (!sep || *sep != ':')
 			return -FDT_ERR_BADOVERLAY;
 
-		path_len = sep - path;
+		path_len = (int)(sep - path);
 		if (path_len == (fixup_len - 1))
 			return -FDT_ERR_BADOVERLAY;
 
@@ -465,7 +463,7 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		if (!sep || *sep != ':')
 			return -FDT_ERR_BADOVERLAY;
 
-		name_len = sep - name;
+		name_len = (int)(sep - name);
 		if (!name_len)
 			return -FDT_ERR_BADOVERLAY;
 
@@ -474,8 +472,8 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 			return -FDT_ERR_BADOVERLAY;
 
 		ret = overlay_fixup_one_phandle(fdt, fdto, symbols_off,
-						path, path_len, name, name_len,
-						(uint32_t)poffset, label);
+						path, (uint32_t)path_len, name, (uint32_t)name_len,
+						poffset, label);
 		if (ret)
 			return ret;
 	} while (len > 0);
@@ -738,7 +736,7 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 			return -FDT_ERR_BADOVERLAY;
 
 		frag_name = path + 1;
-		frag_name_len = s - path - 1;
+		frag_name_len = (int)(s - path - 1);
 
 		/* verify format; safe since "s" lies in \0 terminated prop */
 		len = sizeof("/__overlay__/") - 1;
@@ -746,7 +744,7 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 			return -FDT_ERR_BADOVERLAY;
 
 		rel_path = s + len;
-		rel_path_len = e - rel_path;
+		rel_path_len = (int)(e - rel_path);
 
 		/* find the fragment index in which the symbol lies */
 		ret = fdt_subnode_offset_namelen(fdto, 0, frag_name,

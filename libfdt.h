@@ -1892,6 +1892,7 @@ int fdt_overlay_apply(void *fdt, void *fdto);
 
 int fdt_get_int_or_default(const void *fdt, int node, const char *name, int def);
 const char* fdt_get_string_or_default(const void *fdt, int node, const char *name, const char *def);
+int fdt_find_node_by_ref(void *fdt, int fdt_node, const char *prop_ref);
 
 /**********************************************************************/
 /* Debugging / informational functions                                */
